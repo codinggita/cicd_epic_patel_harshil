@@ -27,7 +27,8 @@ export const getPaginatedData = async (model, query, filter = {}, searchFields =
     .select(projection)
     .sort(sort)
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return {
     total,

@@ -22,7 +22,7 @@ export const getAllItems = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/knowledge/:id
 // @access  Public
 export const getItemById = asyncHandler(async (req, res) => {
-  const item = await KnowledgeItem.findById(req.params.id);
+  const item = await KnowledgeItem.findById(req.params.id).lean();
   if (!item) {
     return sendResponse(res, 404, false, 'Knowledge item not found', null, { message: 'Invalid ID' });
   }
@@ -79,9 +79,16 @@ export const getStats = asyncHandler(async (req, res) => {
     { $limit: 10 }
   ]);
 
+  const latestRecords = await KnowledgeItem.find()
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .select('instruction topic difficulty createdAt')
+    .lean();
+
   return sendResponse(res, 200, true, 'Statistics fetched successfully', {
     totalRecords,
     byDifficulty,
-    mostUsedTopics: byTopic
+    mostUsedTopics: byTopic,
+    latestRecords
   });
 });
